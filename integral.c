@@ -2,32 +2,68 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <math.h>
 
-int main(int argc, char *argv[]){
+#define PI 3.14159265
 
-if(argc<5){
-	printf("Falta parametro: /.<prog> <n> <a> <b> <threads>\n");
-	return 0;
+double f1(int x){
+	x=5;
+	return x;
 }
 
-int n, a, b, numeroThreads;
-double h=(b-a)/n;
+double f2(int x){
+	x=sin(2*x)+cos(5*x);
+	return x;
+}
 
-n=atoi(argv[1]);
-a=atoi(argv[2]);
-b=atoi(argv[3]);
-numeroThreads=atoi(argv[4]);
+int main(){
 
-printf("n=%d a=%d b=%d threads=%d\n", n, a, b, numeroThreads);
+int n, numeroThreads, funcao;
+double a, b;
 
-int* vetor=(int*)malloc(sizeof(int)*numeroThreads);
+printf("Digite quantidade de trapezios\n");
+scanf("%d", &n);
+printf("Digite quantidade de threads\n");
+scanf("%d", &numeroThreads);
+printf("Digite o limite a\n");
+scanf("%le", &a);
+printf("Digite o limite b\n");
+scanf("%le", &b);
+printf("Digite 1 para funcao 1; 2 para funcao 2\n");
+scanf("%d", &funcao);
 
-for(int i=0; i<numeroThreads; i++){ //preenchendo vetor
+int* vetor=(int*)malloc(sizeof(int)*numeroThreads);//alocando vetor com o numeros de trapezios que cada thread vai calcular
+b=b*PI;
+
+
+for(int i=0; i<numeroThreads; i++){ //preenchendo vetor, indice=numero da thread, conteudo=numero de trapezios
 	vetor[i]=i;
 }
 
-for(int i=0; i<numeroThreads; i++){ //imprimindo vetor
+for(int i=0; i<numeroThreads; i++){ //imprimindo vetor, indice=numero da thread, conteudo=numero de trapezios
 	printf("Thread %d = %d\n", i+1, vetor[i]);
+}
+
+if(funcao==1){
+	double h=(b-a)/n;
+	double area_total=(f2(a)+f2(b))/2;
+	for(int i=1; i<n; i++){
+		int x_i=a+i*h;
+		area_total+=f2(x_i);
+	}
+area_total=h*area_total;
+printf("area = %f\n", area_total);
+}
+
+if(funcao==2){
+	double h=(b-a)/n;
+	double area_total=(f2(a)+f2(b))/2;
+	for(int i=1; i<n; i++){
+		int x_i=a+i*h;
+		area_total+=f2(x_i);
+	}
+area_total=h*area_total;
+printf("area = %f\n", area_total);
 }
 
 return 0;
