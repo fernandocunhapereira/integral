@@ -6,12 +6,12 @@
 
 #define PI 3.14159265
 
-double f1(int x){
+double f1(double x){
 	x=5;
 	return x;
 }
 
-double f2(int x){
+double f2(double x){
 	x=sin(2*x)+cos(5*x);
 	return x;
 }
@@ -65,6 +65,13 @@ if(funcao==2){
 area_total=h*area_total;
 printf("area = %f\n", area_total);
 }
+
+printf("cos PI = %.2e\n", cos(PI));
+printf("sen PI = %.2e\n", sin(PI));
+printf("cos 2PI = %.2e\n", cos(2*PI));
+printf("sen 2PI = %.2e\n", sin(2*PI));
+printf("cos PI/2 = %.2e\n", cos(PI/2));
+printf("sen PI/2 = %.2e\n", sin(PI/2));
 
 return 0;
 }
