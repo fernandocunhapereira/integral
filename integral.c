@@ -33,17 +33,31 @@ scanf("%le", &b);
 printf("Digite 1 para funcao 1; 2 para funcao 2\n");
 scanf("%d", &funcao);
 
+int aux=n;
+int contador=0;
+
 int* vetor=(int*)malloc(sizeof(int)*numeroThreads);//alocando vetor com o numeros de trapezios que cada thread vai calcular
 
+/*
 for(int i=0; i<numeroThreads; i++){ //preenchendo vetor, indice=numero da thread, conteudo=numero de trapezios
 	vetor[i]=i;
-}
+}*/
+
+do{
+	vetor[contador]+=1;
+	if(contador==numeroThreads-1){
+		contador=0;
+	}else{
+		contador++;
+	}
+	aux--;
+}while(aux>0);
 
 for(int i=0; i<numeroThreads; i++){ //imprimindo vetor, indice=numero da thread, conteudo=numero de trapezios
-	printf("Thread %d = %d\n", i+1, vetor[i]);
+	printf("Thread %d = %d trapezios\n", i+1, vetor[i]);
 }
 
-//===========================FUNCAO 1: CONSTANTE==========================
+//======================FUNCAO 1: CONSTANTE (SEM THREAD)=================
 
 if(funcao==1){ //Solucao 1
 	double h=(b-a)/n;
@@ -68,7 +82,7 @@ printf("Solucao 2, funcao 1 (constante): area = %.2e\n", area_total);
 //====================================FIM=================================
 
 
-//===================FUNCAO 2: f(x)=f(x)=sen(2x)+cos(5x)==================
+//===============FUNCAO 2: f(x)=f(x)=sen(2x)+cos(5x) (SEM THREAD)==========
 
 if(funcao==2){ //Solucao 1
 	b=b*PI;
@@ -82,7 +96,7 @@ printf("Solucao 1, funcao 2 f(x)=sen(2x)+cos(5x): area = %.2e\n", area_total);
 }
 
 if(funcao==2){ //Solucao 2
-	b=b*PI;
+	//b=b*PI; valor de b já foi alterado na Solucao 1
 	double h=(b-a)/n;
 	double area_total=(f2(a)+f2(b))/2;
 	for(int i=1; i<n; i++){
@@ -92,7 +106,7 @@ if(funcao==2){ //Solucao 2
 area_total=h*area_total;
 printf("Solucao 2, funcao 2 f(x)=sen(2x)+cos(5x): area = %.2e\n", area_total);
 }
-//====================================FIM==================================
+//====================================FIM=================================
 
 /*
 printf("cos PI = %.2e\n", cos(PI));
@@ -101,6 +115,8 @@ printf("cos 2PI = %.2e\n", cos(2*PI));
 printf("sen 2PI = %.2e\n", sin(2*PI));
 printf("cos PI/2 = %.2e\n", cos(PI/2));
 printf("sen PI/2 = %.2e\n", sin(PI/2));*/
+
+free(vetor);
 
 return 0;
 }
