@@ -37,7 +37,30 @@ void* constante(void* tid){
 		area_total+=((f1(x_i)+f1(x_i+h))*h)/2;
 	}
 	resultados[(int)(size_t)tid]=area_total;
-	printf("Thread %d executada e calculou area= %le\n", (int)(size_t)tid, area_total);
+	printf("Thread %d executada e calculou area = %le\n", (int)(size_t)tid, area_total);
+	pthread_exit(NULL);
+}
+
+void* constante2(void* tid){
+	double a_local=a;
+	double b_local;
+	double h=(b-a)/n;
+	if(tid==0){//calculando a_local e b_local
+		b_local=a_local+(h*vetor[(int)(size_t)tid]);
+	}
+	if(tid>0){
+		for(int i=0; i<(int)(size_t)tid; i++){
+			a_local=a_local+(h*vetor[(int)(size_t)tid]);
+		}
+		b_local=a_local+(h*vetor[(int)(size_t)tid]);
+	}
+	double area_total=(f1(a_local)+f1(b_local))/2;
+	for(int i=1; i<vetor[(int)(size_t)tid]; i++){
+		double x_i=a_local+i*h;
+		area_total+=f1(x_i);
+	}
+	resultados[(int)(size_t)tid]=h*area_total;
+	printf("Thread %d executada e calculou area = %le\n", (int)(size_t)tid, area_total);
 	pthread_exit(NULL);
 }
 
@@ -56,10 +79,34 @@ void* trigonometrica(void* tid){
 		area_total+=((f2(x_i)+f2(x_i+h))*h)/2;
 	}
 	resultados[(int)(size_t)tid]=area_total;
-	printf("Thread %d executada e calculou area= %le\n", (int)(size_t)tid, area_total);
+	printf("Thread %d executada e calculou area = %le\n", (int)(size_t)tid, area_total);
 	pthread_exit(NULL);
 }
 
+void* trigonometrica2(void* tid){
+	//b=b*PI; valor de b já foi alterado na resolução sem thread
+	double a_local=a;
+	double b_local;
+	double h=(b-a)/n;
+	if(tid==0){//calculando a_local e b_local
+		b_local=a_local+(h*vetor[(int)(size_t)tid]);
+	}
+	if(tid>0){
+		for(int i=0; i<(int)(size_t)tid; i++){
+			a_local=a_local+(h*vetor[(int)(size_t)tid]);
+		}
+		b_local=a_local+(h*vetor[(int)(size_t)tid]);
+	}
+	double area_total=(f2(a_local)+f2(b_local))/2;
+	for(int i=1; i<vetor[(int)(size_t)tid]; i++){
+		double x_i=a_local+i*h;
+		area_total+=f2(x_i);
+	}
+	resultados[(int)(size_t)tid]=h*area_total;
+	printf("Thread %d executada e calculou area = %le\n", (int)(size_t)tid, area_total);
+	pthread_exit(NULL);
+}
+//=========================INICIO DA MAIN=============================
 int main(){
 
 printf("Digite quantidade de trapezios\n");
@@ -150,6 +197,7 @@ printf("Solucao 2, funcao 2: f(x)=sen(2x)+cos(5x): area = %.2e\n", area_total);
 printf("\n");
 //====================================FIM=================================
 
+//=============CRIACAO DAS THREADS PRA CALCULAR USANDO SOLUCAO 1=================
 if(funcao==1){
 	for(int i=0; i<numeroThreads; i++){
 		status=pthread_create(&threads[i], NULL, constante, (void*)(size_t)i);
@@ -175,13 +223,47 @@ printf("\n");
 printf("Resultados com uso de threads\n");
 
 if(funcao==1){
-printf("Area da função 1 (constante) = %.2e\n", resultado_final);
-printf("\n");
+printf("Solucao 1, função 1: (constante): area = %.2e\n", resultado_final);
 }
 if(funcao==2){
-printf("Area da função 2 f(x)=sen(2x)+cos(5x) = %.2e\n", resultado_final);
-printf("\n");	
+printf("Solucao 1, função 2: f(x)=sen(2x)+cos(5x): area = %.2e\n", resultado_final);	
 }
+printf("\n");
+//============================FIM========================================
+
+//=============CRIACAO DAS THREADS PRA CALCULAR USANDO SOLUCAO 2=================
+for(int i=0; i<numeroThreads; i++){
+	resultados[i]=0;
+}
+
+if(funcao==1){
+	for(int i=0; i<numeroThreads; i++){
+		status=pthread_create(&threads[i], NULL, constante2, (void*)(size_t)i);
+	}
+}
+
+if(funcao==2){
+	for(int i=0; i<numeroThreads; i++){
+		status=pthread_create(&threads[i], NULL, trigonometrica2, (void*)(size_t)i);
+	}
+}
+
+for(int i=0; i<numeroThreads; i++){ //aguardando fim das threads
+	pthread_join(threads[i], &thread_return);
+}
+
+for(int i=0; i<numeroThreads; i++){ //soma dos resultados calculados pelas threads
+	resultado_final=resultado_final+resultados[i];
+}
+
+if(funcao==1){
+printf("Solucao 2, função 1: (constante): area = %.2e\n", resultado_final);
+}
+if(funcao==2){
+printf("Solucao 2, função 2: f(x)=sen(2x)+cos(5x): area = %.2e\n", resultado_final);	
+}
+printf("\n");
+//==========================FIM=================================
 
 for(int i=0; i<numeroThreads; i++){
 	printf("valor do vetor resultados na posicao %d = %le\n", i, resultados[i]);
