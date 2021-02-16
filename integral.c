@@ -26,7 +26,7 @@ double f2(double x){
 void* constante(void* tid){
 	double a_local=a;
 	double h=(b-a)/n;
-	if(tid>0){//calculando a local
+	if(tid>0){//calculando a_local
 		for(int i=0; i<(int)(size_t)tid; i++){
 			a_local=a_local+(h*vetor[(int)(size_t)tid]);
 		}
@@ -42,7 +42,21 @@ void* constante(void* tid){
 }
 
 void* trigonometrica(void* tid){
-	//printf("Thread %d executada\n", (int)(size_t)tid);
+	//b=b*PI; valor de b já foi alterado na resolução sem thread
+	double a_local=a;
+	double h=(b-a)/n;
+	if(tid>0){//calculando a_local
+		for(int i=0; i<(int)(size_t)tid; i++){
+			a_local=a_local+(h*vetor[(int)(size_t)tid]);
+		}
+	}
+	double area_total=((f2(a_local)+f2(a_local+h))*h)/2;
+	for(int i=1; i<vetor[(int)(size_t)tid]; i++){
+		double x_i=a_local+i*h;
+		area_total+=((f2(x_i)+f2(x_i+h))*h)/2;
+	}
+	resultados[(int)(size_t)tid]=area_total;
+	printf("Thread %d executada e calculou area= %le\n", (int)(size_t)tid, area_total);
 	pthread_exit(NULL);
 }
 
@@ -83,6 +97,7 @@ for(int i=0; i<numeroThreads; i++){ //imprimindo vetor, indice=numero da thread,
 printf("\n");
 
 //======================FUNCAO 1: CONSTANTE (SEM THREAD)=================
+
 printf("Resultados sem uso de threads\n");
 
 if(funcao==1){ //Solucao 1
@@ -108,7 +123,7 @@ printf("Solucao 2, funcao 1: (constante): area = %.2e\n", area_total);
 //====================================FIM=================================
 
 
-//===============FUNCAO 2: f(x)=f(x)=sen(2x)+cos(5x) (SEM THREAD)==========
+//===============FUNCAO 2: f(x)=sen(2x)+cos(5x) (SEM THREAD)==========
 
 if(funcao==2){ //Solucao 1
 	b=b*PI;
@@ -141,6 +156,12 @@ if(funcao==1){
 	}
 }
 
+if(funcao==2){
+	for(int i=0; i<numeroThreads; i++){
+		status=pthread_create(&threads[i], NULL, trigonometrica, (void*)(size_t)i);
+	}
+}
+
 for(int i=0; i<numeroThreads; i++){ //aguardando fim das threads
 	pthread_join(threads[i], &thread_return);
 }
@@ -152,8 +173,15 @@ for(int i=0; i<numeroThreads; i++){ //soma dos resultados calculados pelas threa
 
 printf("\n");
 printf("Resultados com uso de threads\n");
-printf("Funcao 2: f(x)=sen(2x)+cos(5x): area = %.2e\n", resultado_final);
+
+if(funcao==1){
+printf("Area da função 1 (constante) = %.2e\n", resultado_final);
 printf("\n");
+}
+if(funcao==2){
+printf("Area da função 2 f(x)=sen(2x)+cos(5x) = %.2e\n", resultado_final);
+printf("\n");	
+}
 
 for(int i=0; i<numeroThreads; i++){
 	printf("valor do vetor resultados na posicao %d = %le\n", i, resultados[i]);
