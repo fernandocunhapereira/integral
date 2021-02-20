@@ -28,7 +28,7 @@ void* constante(void* tid){
 	double h=(b-a)/n;
 	if(tid>0){//calculando a_local
 		for(int i=0; i<(int)(size_t)tid; i++){
-			a_local=a_local+(h*vetor[(int)(size_t)tid]);
+			a_local=a_local+(h*vetor[i]);
 		}
 	}
 	double area_total=((f1(a_local)+f1(a_local+h))*h)/2;
@@ -37,7 +37,7 @@ void* constante(void* tid){
 		area_total+=((f1(x_i)+f1(x_i+h))*h)/2;
 	}
 	resultados[(int)(size_t)tid]=area_total;
-	printf("Thread %d executada e calculou area = %le\n", (int)(size_t)tid, area_total);
+	//printf("Thread %d executada e calculou area = %le\n", (int)(size_t)tid, area_total);
 	pthread_exit(NULL);
 }
 
@@ -50,7 +50,7 @@ void* constante2(void* tid){
 	}
 	if(tid>0){
 		for(int i=0; i<(int)(size_t)tid; i++){
-			a_local=a_local+(h*vetor[(int)(size_t)tid]);
+			a_local=a_local+(h*vetor[i]);
 		}
 		b_local=a_local+(h*vetor[(int)(size_t)tid]);
 	}
@@ -60,17 +60,16 @@ void* constante2(void* tid){
 		area_total+=f1(x_i);
 	}
 	resultados[(int)(size_t)tid]=h*area_total;
-	printf("Thread %d executada e calculou area = %le\n", (int)(size_t)tid, area_total);
+	//printf("Thread %d executada e calculou area = %le\n", (int)(size_t)tid, area_total);
 	pthread_exit(NULL);
 }
 
 void* trigonometrica(void* tid){
-	//b=b*PI; valor de b já foi alterado na resolução sem thread
 	double a_local=a;
 	double h=(b-a)/n;
 	if(tid>0){//calculando a_local
 		for(int i=0; i<(int)(size_t)tid; i++){
-			a_local=a_local+(h*vetor[(int)(size_t)tid]);
+			a_local=a_local+(h*vetor[i]);
 		}
 	}
 	double area_total=((f2(a_local)+f2(a_local+h))*h)/2;
@@ -79,12 +78,11 @@ void* trigonometrica(void* tid){
 		area_total+=((f2(x_i)+f2(x_i+h))*h)/2;
 	}
 	resultados[(int)(size_t)tid]=area_total;
-	printf("Thread %d executada e calculou area = %le\n", (int)(size_t)tid, area_total);
+	//printf("Thread %d executada e calculou area = %le\n", (int)(size_t)tid, area_total);
 	pthread_exit(NULL);
 }
 
 void* trigonometrica2(void* tid){
-	//b=b*PI; valor de b já foi alterado na resolução sem thread
 	double a_local=a;
 	double b_local;
 	double h=(b-a)/n;
@@ -93,7 +91,7 @@ void* trigonometrica2(void* tid){
 	}
 	if(tid>0){
 		for(int i=0; i<(int)(size_t)tid; i++){
-			a_local=a_local+(h*vetor[(int)(size_t)tid]);
+			a_local=a_local+(h*vetor[i]);
 		}
 		b_local=a_local+(h*vetor[(int)(size_t)tid]);
 	}
@@ -103,7 +101,7 @@ void* trigonometrica2(void* tid){
 		area_total+=f2(x_i);
 	}
 	resultados[(int)(size_t)tid]=h*area_total;
-	printf("Thread %d executada e calculou area = %le\n", (int)(size_t)tid, area_total);
+	//printf("Thread %d executada e calculou area = %le\n", (int)(size_t)tid, area_total);
 	pthread_exit(NULL);
 }
 //=========================INICIO DA MAIN=============================
@@ -173,7 +171,7 @@ printf("Solucao 2, funcao 1: (constante): area = %.2e\n", area_total);
 //===============FUNCAO 2: f(x)=sen(2x)+cos(5x) (SEM THREAD)==========
 
 if(funcao==2){ //Solucao 1
-	b=b*PI; //desativar essa linha para usar apenas o valor de b
+	//b=b*PI; //desativar essa linha para usar apenas o valor de b
 	double h=(b-a)/n;
 	double area_total=((f2(a)+f2(a+h))*h)/2;
 	for(int i=1; i<n; i++){
@@ -184,7 +182,6 @@ printf("Solucao 1, funcao 2: f(x)=sen(2x)+cos(5x): area = %.2e\n", area_total);
 }
 
 if(funcao==2){ //Solucao 2
-	//b=b*PI; valor de b já foi alterado na Solucao 1
 	double h=(b-a)/n;
 	double area_total=(f2(a)+f2(b))/2;
 	for(int i=1; i<n; i++){
@@ -228,7 +225,6 @@ printf("Solucao 1, função 1: (constante): area = %.2e\n", resultado_final);
 if(funcao==2){
 printf("Solucao 1, função 2: f(x)=sen(2x)+cos(5x): area = %.2e\n", resultado_final);	
 }
-printf("\n");
 //============================FIM========================================
 
 //=============CRIACAO DAS THREADS PRA CALCULAR USANDO SOLUCAO 2=================
@@ -266,9 +262,10 @@ printf("Solucao 2, função 2: f(x)=sen(2x)+cos(5x): area = %.2e\n", resultado_f
 printf("\n");
 //==========================FIM=================================
 
+/*
 for(int i=0; i<numeroThreads; i++){
 	printf("valor do vetor resultados na posicao %d = %le\n", i, resultados[i]);
-}
+}*/
 
 free(vetor);
 free(resultados);
