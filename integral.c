@@ -169,7 +169,7 @@ printf("Solucao 2, funcao 1: (constante): area = %.2e\n", area_total);
 //===============FUNCAO 2: f(x)=sen(2x)+cos(5x) (SEM THREAD)==========
 
 if(funcao==2){ //Solucao 1
-	b=b*M_PI; //desativar essa linha para usar apenas o valor de b
+	b=b*M_PI; // ***IMPORTANTE*** desativar essa linha para usar apenas o valor de b
 	double h=(b-a)/n;
 	double area_total=((f2(a)+f2(a+h))*h)/2;
 	for(int i=1; i<n; i++){
